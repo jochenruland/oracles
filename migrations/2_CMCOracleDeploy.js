@@ -1,5 +1,6 @@
-const Migrations = artifacts.require("Migrations");
+const RequestOracle = artifacts.require("RequestOracle");
 
+// Do not forget to pass constructor arguments to deploy function
 module.exports = function (deployer) {
-  deployer.deploy(Migrations);
+  deployer.deploy(RequestOracle);
 };
