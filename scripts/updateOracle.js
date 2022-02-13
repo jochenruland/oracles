@@ -1,12 +1,19 @@
 
+//----------------Imports to retrieve data from coinmakretcap api-------------------
 const apiKeys = require('../API_KEYS.json');
-console.log(apiKeys.coinmarketcap);
-
-/* Example in Node.js */
 const axios = require('axios');
 
+/*----------------Imports to interact and test samart contracts--------------------
+const ganache = require('ganache-cli');
+const Web3 = require('web3');
+const web3 = new Web3(ganache.provider());
+
+const compiledContractJson = require('../build/contracts/CMCOracle.json');
+//---------------------------------------------------------------------------------
+*/
 let response = null;
-new Promise(async (resolve, reject) => {
+
+const promiseGetApiData = new Promise(async (resolve, reject) => {
   try {
     response = await axios.get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=1&convert=EUR', {
       headers: {
@@ -23,22 +30,21 @@ new Promise(async (resolve, reject) => {
   if (response) {
     // success
     const json = response.data;
-    console.log(json);
+    //console.log(json);
     resolve(json);
   }
 });
 
+const getApiData = async () => {
+    const apiData = await promiseGetApiData;
+    const {EUR} = apiData.data['1'].quote
+    console.log(EUR.price)
+    return EUR.price;
+}
 
-/*
-const fetch = require('fetch');
+getApiData();
 
-const ganache = require('ganache-cli');
-const Web3 = require('web3');
-const web3 = new Web3(ganache.provider());
-
-const compiledContractJson = require('../build/contracts/CMCOracle.json');
-
-async function updateCMCOracle () => {
+const updateCMCOracle = async () => {
   accounts = await web3.eth.getAccounts();
 
   const deploymentKey = Object.keys(compiledContractJson.networks)[0];
