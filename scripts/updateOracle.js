@@ -3,14 +3,20 @@
 const apiKeys = require('../API_KEYS.json');
 const axios = require('axios');
 
-/*----------------Imports to interact and test samart contracts--------------------
-const ganache = require('ganache-cli');
+//----------------Imports to interact and test samart contracts--------------------
 const Web3 = require('web3');
-const web3 = new Web3(ganache.provider());
+const provider = new Web3.providers.HttpProvider('http://localhost:8545');
+
+const web3 = new Web3(provider);
+
+//---------------Interacting with the contract via web3---------------------------
 
 const compiledContractJson = require('../build/contracts/CMCOracle.json');
+const deploymentKey = Object.keys(compiledContractJson.networks)[0];
+const contractInstance =new web3.eth.Contract(compiledContractJson.abi, compiledContractJson.networks[deploymentKey].address);
+
 //---------------------------------------------------------------------------------
-*/
+
 let response = null;
 
 const promiseGetApiData = new Promise(async (resolve, reject) => {
@@ -42,15 +48,38 @@ const getApiData = async () => {
     return EUR.price;
 }
 
-getApiData();
-
 const updateCMCOracle = async () => {
   accounts = await web3.eth.getAccounts();
+  //console.log(accounts);
+  //getApiData();
 
-  const deploymentKey = Object.keys(compiledContractJson.networks)[0];
+  // emit event by calling respective contract function
+  //await contractInstance.methods.initCMCDataUpdate().send({from: accounts[0]});
 
-  contractInstance = await new web3.eth.Contract(compiledContractJson.abi, compiledContractJson.networks[deploymentKey].address);
 
+  // if we do not specify the block in the filter the function will select from the last block
+  //const eventInfo = await contractInstance.getPastEvents('CallbackGetEthCap',{/*filter: {on indexed fields},*/ fromBlock: 3804});
+  //console.log(eventInfo);
+
+  await contractInstance.methods.initCMCDataUpdate().send({from: accounts[0]});
+
+}
+
+// reading an event in realtime by using a websocket
+let options = {
+    /*filter: {
+        value: [],
+    },*/
+    fromBlock: 0
+};
+
+contractInstance.events.CallbackGetEthCap(options).on('data', (event) => console.log(event));
+updateCMCOracle();
+
+
+
+
+/*
   // const owner = await contractInstance.methods.owner().call()
 
   await contractInstance.methods.CallbackGetEthCap().call().watch(async (err, event) => {
@@ -64,6 +93,5 @@ const updateCMCOracle = async () => {
     })
   });
 
-});
 
 */
