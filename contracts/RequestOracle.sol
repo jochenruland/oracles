@@ -5,9 +5,17 @@ import "./CMCOracle.sol";
 
 contract RequestOracle {
   CMCOracle public cmcO;
-  uint public ethMC;
+  uint public ethPrice;
 
-  function requestCMCOracle() external {
-    ethMC = cmcO.getCMCData();
+  function initOracle(address _addrCMCOracle) external {
+    cmcO = CMCOracle(_addrCMCOracle);
+  }
+
+  function requestCMCOracleUpdate() external {
+    cmcO.initCMCDataUpdate();
+  }
+
+  function requestCMCOracleData() external {
+    ethPrice = cmcO.ethPrice();
   }
 }
