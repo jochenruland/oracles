@@ -1,17 +1,29 @@
-const ganache = require('ganache-cli');
+//----------------Imports to interact and test samart contracts--------------------
 const Web3 = require('web3');
-const web3 = new Web3(ganache.provider());
+const provider = new Web3.providers.HttpProvider('http://localhost:8545');
+
+const web3 = new Web3(provider);
+
+//---------------Interacting with the contract via web3---------------------------
 
 const compiledContractJson = require('../build/contracts/RequestOracle.json');
-
-const accounts = await web3.eth.getAccounts();
-
 const deploymentKey = Object.keys(compiledContractJson.networks)[0];
+const contractInstance =new web3.eth.Contract(compiledContractJson.abi, compiledContractJson.networks[deploymentKey].address);
 
-contractInstance = await new web3.eth.Contract(compiledContractJson.abi, compiledContractJson.networks[deploymentKey].address);
+  // Get oracle address
+const compiledOracleJson = require('../build/contracts/CMCOracle.json');
+const oracleDeploymentKey = Object.keys(compiledOracleJson.networks)[0];
+const oracleAddress = compiledOracleJson.networks[oracleDeploymentKey].address;
 
-async function printOracleData() {
-  await contractInstance.methods.requestCMCOracle().send({from: accounts[0]});
-  const ethCap = await contractInstance.methods.ethMC().call();
-  console.log(ethCap);
+//---------------------------------------------------------------------------------
+
+const getOracleData = async (addrOracle) => {
+  const accounts = await web3.eth.getAccounts();
+  await contractInstance.methods.initOracle(addrOracle).send({from: accounts[0]});
+  await contractInstance.methods.requestCMCOracleUpdate().send({from: accounts[0]});
+  await contractInstance.methods.requestCMCOracleData().send({from: accounts[0]});
+  const ethPrice = await contractInstance.methods.ethPrice().call();
+  console.log(ethPrice);
 }
+
+getOracleData(oracleAddress);
