@@ -4,24 +4,20 @@ pragma solidity >=0.6.0 <0.9.0;
 contract CMCOracle {
     address public owner;
 
-    uint public ethMarketCap;
+    uint public ethPrice;
 
-    event CallbackGetEthCap();
+    event CallbackGetEthCap(uint id);
 
     constructor() {
         owner = msg.sender;
     }
 
     function initCMCDataUpdate() public {
-        emit CallbackGetEthCap();
+        emit CallbackGetEthCap(1);
     }
 
-    function feedCMCData(uint cap) public onlyOwner {
-      ethMarketCap = cap;
-    }
-
-    function getCMCData() public view returns(uint) {
-      return ethMarketCap;
+    function feedCMCData(uint _ethPrice) public onlyOwner {
+      ethPrice = _ethPrice;
     }
 
     modifier onlyOwner() {
