@@ -21,7 +21,7 @@ let response = null;
 
 const promiseGetApiData = new Promise(async (resolve, reject) => {
   try {
-    response = await axios.get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=1&convert=EUR', {
+    response = await axios.get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=1027&convert=EUR', {
       headers: {
         'X-CMC_PRO_API_KEY': apiKeys.coinmarketcap,
       },
@@ -43,15 +43,13 @@ const promiseGetApiData = new Promise(async (resolve, reject) => {
 
 const getApiData = async () => {
     const apiData = await promiseGetApiData;
-    const {EUR} = apiData.data['1'].quote
+    const {EUR} = apiData.data['1027'].quote
     console.log(EUR.price)
     return EUR.price;
 }
 
 const updateCMCOracle = async () => {
   accounts = await web3.eth.getAccounts();
-  //console.log(accounts);
-  //getApiData();
 
   // emit event by calling respective contract function
   //await contractInstance.methods.initCMCDataUpdate().send({from: accounts[0]});
@@ -66,12 +64,19 @@ const updateCMCOracle = async () => {
   let options = {
       /*filter: {
           value: [],
-      },*/
-      fromBlock: 0
+      },
+      fromBlock: 0*/
   }
 
   // works only in combination with Web3.providers.WebsocketProvider
-  contractInstance.events.CallbackGetEthCap(options).on('data', event => console.log(event));
+  contractInstance.events.CallbackGetEthCap(options).on('data', async (event) => {
+    console.log('Event handled')
+    let eur = await getApiData();
+    eur = parseInt(eur * 100);
+    await contractInstance.methods.feedCMCData(eur).send({from: accounts[0]});
+    console.log(eur);
+
+  });
 
   //await contractInstance.methods.initCMCDataUpdate().send({from: accounts[0]});
 
