@@ -5,7 +5,7 @@ const axios = require('axios');
 
 //----------------Imports to interact and test samart contracts--------------------
 const Web3 = require('web3');
-const provider = new Web3.providers.HttpProvider('http://localhost:8545');
+const provider = new Web3.providers.WebsocketProvider('http://localhost:8545');
 
 const web3 = new Web3(provider);
 
@@ -61,19 +61,24 @@ const updateCMCOracle = async () => {
   //const eventInfo = await contractInstance.getPastEvents('CallbackGetEthCap',{/*filter: {on indexed fields},*/ fromBlock: 3804});
   //console.log(eventInfo);
 
-  await contractInstance.methods.initCMCDataUpdate().send({from: accounts[0]});
+
+  // reading an event in realtime by using a websocket
+  let options = {
+      /*filter: {
+          value: [],
+      },*/
+      fromBlock: 0
+  }
+
+  // works only in combination with Web3.providers.WebsocketProvider
+  contractInstance.events.CallbackGetEthCap(options).on('data', event => console.log(event));
+
+  //await contractInstance.methods.initCMCDataUpdate().send({from: accounts[0]});
+
 
 }
 
-// reading an event in realtime by using a websocket
-let options = {
-    /*filter: {
-        value: [],
-    },*/
-    fromBlock: 0
-};
 
-contractInstance.events.CallbackGetEthCap(options).on('data', (event) => console.log(event));
 updateCMCOracle();
 
 
