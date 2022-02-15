@@ -16,14 +16,23 @@ const oracleDeploymentKey = Object.keys(compiledOracleJson.networks)[0];
 const oracleAddress = compiledOracleJson.networks[oracleDeploymentKey].address;
 
 //---------------------------------------------------------------------------------
+let accounts;
 
-const getOracleData = async (addrOracle) => {
-  const accounts = await web3.eth.getAccounts();
+const requestOracleData = async (addrOracle) => {
+  accounts = await web3.eth.getAccounts();
   await contractInstance.methods.initOracle(addrOracle).send({from: accounts[0]});
   await contractInstance.methods.requestCMCOracleUpdate().send({from: accounts[0]});
+}
+
+const getOracleData = async () => {
   await contractInstance.methods.requestCMCOracleData().send({from: accounts[0]});
   const ethPrice = await contractInstance.methods.ethPrice().call();
   console.log(ethPrice);
 }
 
-getOracleData(oracleAddress);
+const main = async () => {
+  await requestOracleData(oracleAddress);
+  await getOracleData();
+}
+
+main();
