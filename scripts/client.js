@@ -1,4 +1,4 @@
-//----------------Imports to interact and test samart contracts--------------------
+//----------------Imports to interact and test smart contracts--------------------
 const Web3 = require('web3');
 const provider = new Web3.providers.HttpProvider('http://localhost:8545');
 
