@@ -3,7 +3,7 @@
 const apiKeys = require('../API_KEYS.json');
 const axios = require('axios');
 
-//----------------Imports to interact and test samart contracts--------------------
+//----------------Imports to interact and test smart contracts--------------------
 const Web3 = require('web3');
 const provider = new Web3.providers.WebsocketProvider('http://localhost:8545');
 
@@ -85,23 +85,3 @@ const updateCMCOracle = async () => {
 
 
 updateCMCOracle();
-
-
-
-
-/*
-  // const owner = await contractInstance.methods.owner().call()
-
-  await contractInstance.methods.CallbackGetEthCap().call().watch(async (err, event) => {
-    fetch.fetchUrl('https://api.coinmarketcap.com/vl/global/', (err, m, b) => {
-      const cmcJson = JSON.parse(b.toString());
-      const ethMarketCap = parseInt(cmcJson.total_market_cap_usd)
-
-      //Send data back to contact on-chain
-      await contractInstance.methods.feedCMCData(ethMarketCap).send({from accounts[0]});
-
-    })
-  });
-
-
-*/
